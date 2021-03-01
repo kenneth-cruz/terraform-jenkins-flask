@@ -47,7 +47,6 @@ resource "kubernetes_namespace" "jenkins" {
       }
     }
   }
-}
 resource "kubernetes_service" "jenkins_service" {
   metadata {
     name      = "jenkins-service"
