@@ -6,7 +6,7 @@ pipeline {
                 checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/kenneth-cruz/terraform-jenkins-flask']]])
             }
         } 
-        stage("Create Kubernetes Deployment and Service") {
+        stage('Create Kubernetes Deployment and Service') {
             steps {
                 sh 'terraform init'
                 sh 'pwd'

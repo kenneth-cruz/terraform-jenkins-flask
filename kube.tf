@@ -9,10 +9,10 @@ provider "kubernetes" {
   config_path = "~/../../.kube/config"
 }
 
-resource "kubernetes_namespace" "flaskapp" {
+resource "kubernetes_namespace" "jenkins" {
   metadata {
     annotations = {
-      name = "flaskapp"
+      name = "jenkins"
     }
 
     labels = {
@@ -22,60 +22,44 @@ resource "kubernetes_namespace" "flaskapp" {
     name = "flaskapp"
   }
 }
-
-
-resource "kubernetes_deployment" "flaskapp" {
-  metadata {
-    namespace = kubernetes_namespace.flaskapp.metadata.0.name
-    name      = "flaskapp"
-    labels = {
-      App = "flaskapp"
-    }
-  }
   spec {
-    replicas = 10
+    replicas = 1
     selector {
       match_labels = {
-        App = "flaskapp"
+        App = "ScalableNginxExample"
       }
     }
     template {
       metadata {
         labels = {
-          App = "flaskapp"
+          App = "ScalableNginxExample"
         }
       }
       spec {
         container {
-          image = "tomkugelman/capstone-flask:latest"
+          image = "jenkinsci/blueocean"
           name  = "example"
           port {
-            container_port = 80
+            container_port = 8080
           }
         
         }
       }
     }
   }
-  timeouts {
-    create = "1m"
-    update = "1m"
-    delete = "2m"
-  }
 }
-resource "kubernetes_service" "flaskapp" {
+resource "kubernetes_service" "jenkins_service" {
   metadata {
-    namespace = kubernetes_namespace.flaskapp.metadata.0.name
-    name      = "flaskapp"
+    name      = "jenkins-service"
   }
   spec {
     selector = {
-      App = kubernetes_deployment.flaskapp.spec.0.template.0.metadata[0].labels.App
+      App = kubernetes_deployment.jenkins.spec.0.template.0.metadata[0].labels.App
     }
     port {
       node_port   = 30201
-      port        = 80
-      target_port = 80
+      port        = 8080
+      target_port = 8080
     }
     type = "NodePort"
   }
