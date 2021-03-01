@@ -3,7 +3,7 @@ pipeline {
     stages {
         stage("Checkout from SCM") {
             steps {
-                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/kenneth-cruz/terraform-jenkins-flask']]])
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/kenneth-cruz/terraform-jenkins-flask']]])
             }
         } 
         stage("Create Kubernetes Deployment and Service") {
