@@ -1,25 +1,18 @@
 pipeline {
-		agent any
-
+    agent {node 'ubuntu-worker-2'} 
+    stages {
+        stage("Checkout from SCM") {
+            steps {
+                checkout([$class: 'GitSCM', branches: [[name: '*/master']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/TomKugelman/Terraform-jenkins-kubernetes-flask']]])
+            }
+        } 
+        stage("Create Kubernetes Deployment and Service") {
+            steps {
+                sh 'terraform init'
+                sh 'pwd'
+                sh 'terraform validate'
+                sh 'terraform apply -auto-approve'
+            }
         }
-		stages {
-			stage('checkout SCM'){
-				steps {
-					checkout scm
-				}
-			}
-			stage('terraform init'){
-				steps{
-					script{
-						sh 'terraform init'
-                        sh 'terraform refresh'
-					}
-				}
-			}
-			stage('Deploy to kubernetes'){
-				steps{
-					sh 'terraform apply -auto-approve'
-				}
-			}
-		}
-	}
+    }
+}
