@@ -5,23 +5,19 @@ terraform {
     }
   }
 }
+
 provider "kubernetes" {
   config_path = "~/../../.kube/config"
 }
 
-resource "kubernetes_namespace" "jenkins" {
+resource "kubernetes_deployment" "jenkins" {
   metadata {
-    annotations = {
-      name = "jenkins"
-    }
-
+    name = "jenkins"
     labels = {
       App = "ScalableNginxExample"
     }
-
-    name = "flaskapp"
   }
-}
+
   spec {
     replicas = 1
     selector {
@@ -39,17 +35,30 @@ resource "kubernetes_namespace" "jenkins" {
         container {
           image = "jenkinsci/blueocean"
           name  = "example"
+
           port {
             container_port = 8080
           }
-        
+
+          resources {
+            limits = {
+              cpu    = "0.5"
+              memory = "512Mi"
+            }
+            requests = {
+              cpu    = "250m"
+              memory = "50Mi"
+            }
+          }
         }
       }
     }
   }
+}
+
 resource "kubernetes_service" "jenkins_service" {
   metadata {
-    name      = "jenkins-service"
+    name = "jenkins-service"
   }
   spec {
     selector = {
@@ -60,6 +69,7 @@ resource "kubernetes_service" "jenkins_service" {
       port        = 8080
       target_port = 8080
     }
+
     type = "NodePort"
   }
 }
